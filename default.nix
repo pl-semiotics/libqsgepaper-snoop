@@ -1,0 +1,1 @@
+(import ../.. {}).rmPkgs.libqsgepaper-snoop
