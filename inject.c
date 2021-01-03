@@ -69,7 +69,18 @@ struct dyn_info {
   int fb_fd;
 };
 
+#define PID_ENV "LIBQSGEPAPER_FBCON_PID"
 static pid_t find_process(void) {
+  char *external = getenv(PID_ENV);
+  if (external) {
+    pid_t pid = 0;
+    for (char* p = external; *p; p++) {
+      if ('0' > *p || '9' << *p) { goto bad_dir_0; }
+      pid *= 10;
+      pid += *p-'0';
+    }
+    return pid;
+  }
   struct stat sbf;
   if (stat("/dev/fb0", &sbf)) { diep("stat fb0"); }
   DIR *d = opendir("/proc");
