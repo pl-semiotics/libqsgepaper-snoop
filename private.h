@@ -3,10 +3,11 @@
 #define INJ_FBADDR_OFF 4
 #define INJ_SKPID_OFF 5
 #define INJ_QIB_OFF 6
-#define INJ_SFB_OFF 7
-#define INJ_SUADDR_OFF 8
-#define INJ_SUPR_OFF 9
-#define INJ_SUPRHK_OFF 13
+#define INJ_REQFD_OFF 7
+#define INJ_SFB_OFF 8
+#define INJ_SUADDR_OFF 9
+#define INJ_SUPR_OFF 10
+#define INJ_SUPRHK_OFF 14
 #define N_PREAMBLE_INSTRS 3
 
 #define INJ_MAGIC_0 0x562bf2d9

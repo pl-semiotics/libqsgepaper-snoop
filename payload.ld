@@ -7,6 +7,7 @@ SECTIONS
     *(.cheader0)
     *(.cheader1)
     *(.cheader2)
+    *(.cheader3)
     *(.asentry)
     *(.text)
     *(.data)

@@ -456,6 +456,7 @@ wait_for_syscall_exit:
 #define INJECTABLE_ENV "LIBQSGEPAPER_SNOOP_PAYLOAD"
 uint __attribute__((weak)) injectable_begin = 0;
 uint __attribute__((weak)) injectable_end = 0;
+#define REQFD_ENV "LIBQSGEPAPER_SNOOP_REQUESTED_FD"
 void load_injectable(struct dyn_info *info) {
   uint *start = &injectable_begin;
   size_t size = &injectable_end-&injectable_begin;
@@ -485,6 +486,18 @@ void load_injectable(struct dyn_info *info) {
     if (i == INJ_FBADDR_OFF) { buf = info->cached->fb_addr; }
     if (i == INJ_SKPID_OFF) { buf = info->socket_binder_pid; }
     if (i == INJ_QIB_OFF) { buf = info->qimage_bits_addr; }
+    if (i == INJ_REQFD_OFF) {
+      buf = -1;
+      char *reqfd = getenv(REQFD_ENV);
+      if (reqfd) {
+        buf = 0;
+        for (char* r = reqfd; *r; r++) {
+          if ('0' > *r || '9' << *r) { die("Bad requested FD\n"); }
+          buf *= 10;
+          buf += *r-'0';
+        }
+      }
+    }
     if (i == INJ_SUADDR_OFF) {
       buf = info->cached->sendUpdate_addr + 4*N_PREAMBLE_INSTRS;
     }

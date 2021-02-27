@@ -37,6 +37,8 @@ __attribute__((section(".cheader1")))
 volatile uint skpid = 0;
 __attribute__((section(".cheader2")))
 volatile uint (*qimage_bits)(uint qimage) = NULL;
+__attribute__((section(".cheader3")))
+volatile int requested_fb_fd = -1;
 
 uint fbaddr = 0;
 uint socketfd = -1;
@@ -118,14 +120,18 @@ void steal_frame_buffer(void) {
     *((char*)(&sa.sa_mask)+i) = 0;
   }
   int ret;
-  if ((ret = syscall(__NR_sigaction, SIGSEGV, &sa, &oldsa)) < 0) {
-    diep("signal", ret);
-  }
-  if ((ret = syscall(__NR_mprotect, fbaddr & ~0x0FFF, FBLEN + (fbaddr & 0xFFF),
-                     PROT_READ)) < 0) { diep("mprotect", ret); }
-  fb_thread();
-  if ((ret = syscall(__NR_sigaction, SIGSEGV, &oldsa, NULL)) < 0) {
-    diep("signal restore", ret);
+  if (requested_fb_fd >= 0) {
+    fbfd = requested_fb_fd;
+  } else {
+    if ((ret = syscall(__NR_sigaction, SIGSEGV, &sa, &oldsa)) < 0) {
+      diep("signal", ret);
+    }
+    if ((ret = syscall(__NR_mprotect, fbaddr & ~0x0FFF, FBLEN + (fbaddr & 0xFFF),
+                       PROT_READ)) < 0) { diep("mprotect", ret); }
+    fb_thread();
+    if ((ret = syscall(__NR_sigaction, SIGSEGV, &oldsa, NULL)) < 0) {
+      diep("signal restore", ret);
+    }
   }
 
   socketfd = syscall(__NR_socket, AF_UNIX, SOCK_DGRAM, 0);
